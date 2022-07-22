@@ -1,0 +1,270 @@
+-------------- Base de Datos Northwind -----------------
+
+use Northwind;
+
+-- Cantidad de unidades vendidas por pedido
+SELECT OrderID, sum(Quantity)
+FROM [Order Details]
+GROUP BY OrderID
+
+-- Monto total de cada pedido
+SELECT OrderID, ceiling(sum(quantity * UnitPrice * (1-Discount))) AS Total
+FROM [Order Details]
+GROUP BY OrderID
+
+-- Monto total de cada pedido del 7/1997
+SELECT OD.OrderID, O.OrderDate, ceiling(sum(quantity * UnitPrice * (1-Discount))) AS Total
+FROM [Order Details] OD
+INNER JOIN Orders O ON OD.OrderID = O.OrderID
+WHERE year(OrderDate) = 1996 AND month(OrderDate) = 7
+GROUP BY OD.OrderID, O.OrderDate
+
+-- Producto más caro vendido en cada pedido
+SELECT OrderId, max(UnitPrice) ProductoMasCaro 
+FROM [Order Details]
+GROUP BY OrderID
+
+-- Cantidad de pedidos realizados por cada cliente
+SELECT C.CustomerID, C.CompanyName, count(OrderId) CantidadPedidos 
+FROM Customers C
+LEFT JOIN Orders O ON O.CustomerID = C.CustomerID
+GROUP BY C.CustomerID, C.CompanyName
+ORDER BY CantidadPedidos DESC
+
+-- Cantidad de pedidos vendidos por cada empleado
+SELECT E.FirstName, E.LastName, count(OrderId) CantidadPedidos FROM Employees E
+LEFT JOIN Orders O ON O.EmployeeID = E.EmployeeID
+WHERE year(OrderDate) = 1997 and month(OrderDate) = 10
+GROUP BY E.FirstName, E.LastName
+ORDER BY CantidadPedidos DESC
+
+-- Productos que contengan la palabra "queso"
+SELECT * FROM Products
+WHERE ProductName LIKE '%queso%'
+
+-- Productos que comiencen con Q
+SELECT * FROM Products
+WHERE ProductName LIKE 'q%'
+
+-- Productos que terminen con G
+SELECT * FROM Products
+WHERE ProductName LIKE '%g'
+
+-- ISNULL
+SELECT CompanyName, ISNULL(Fax, 'SIN FAX') 
+FROM Customers
+
+-- IF
+SELECT *, IIF(Discontinued = 1, 'Yes', 'No'), IIF(UnitPrice > 20, 'Caro', 'Barato') 
+FROM Products
+
+-- INNER JOIN (el ID de la tabla 1 debe existir en la tabla 2)
+SELECT * FROM Autor A
+INNER JOIN Libros L ON A.id = L.id_autor
+
+-- LEFT JOIN (no importa si el ID de la tabla 1 existe en la tabla 2)
+SELECT * FROM Autor A
+LEFT JOIN Libros L ON A.id = L.id_autor
+LEFT JOIN Idioma I ON l.id_idioma = i.id
+
+SELECT * 
+FROM Products
+WHERE ProductName LIKE '%Queso%';
+
+SELECT CompanyName, ISNULL(Fax,'SIN FAX') 
+FROM Customers;
+
+SELECT *, IIF(Discontinued = 1, 'YES', 'NO'), IIF(UnitPrice > 20, 'Caro',  'Barato') Precio
+FROM Products;
+
+SELECT OrderID, SUM(Quantity) Cantidad 
+FROM [Order Details] od 
+GROUP BY OrderID;
+
+SELECT od.OrderID, o.OrderDate, CEILING(SUM(Quantity * UnitPrice)) Subtotal 
+FROM [Order Details] od
+INNER JOIN Orders O ON Od.OrderID = o.OrderID
+GROUP BY od.OrderID, o.OrderDate;
+
+SELECT od.OrderID, o.OrderDate, CEILING(SUM(Quantity * UnitPrice)) Subtotal 
+FROM [Order Details] od
+INNER JOIN Orders O ON Od.OrderID = o.OrderID
+WHERE YEAR(OrderDate) = 1996 AND MONTH(OrderDate) = 7
+GROUP BY od.OrderID, o.OrderDate;
+
+SELECT OrderID, MAX(UnitPrice) ProductoMasCaro 
+FROM [Order Details]
+GROUP BY OrderID;
+
+SELECT C.CustomerID, C.CompanyName, COUNT(OrderID) CantidadPedidos
+FROM Customers C
+INNER JOIN Orders O ON O.CustomerID = C.CustomerID
+GROUP BY C.CustomerID, C.CompanyName
+ORDER BY CantidadPedidos DESC;
+
+SELECT E.FirstName, E.LastName, COUNT(OrderID) CantidadPedidos
+FROM Employees E
+LEFT JOIN Orders O ON O.EmployeeID = E.EmployeeID
+WHERE YEAR(OrderDate) = 1997 AND MONTH(OrderDate) = 10
+GROUP BY E.FirstName, E.LastName
+ORDER BY CantidadPedidos DESC;
+
+
+-------------- Base de Datos CatalogoLibros ---------------
+
+use CatalogoLibros;
+
+SELECT * FROM Autor A
+LEFT JOIN Libros L ON A.id = L.id_autor;
+
+SELECT * FROM Autor A
+INNER JOIN Libros L ON A.id = L.id_autor;
+
+/*------------ Tabla Shipper -------------*/
+
+insert into Shippers (CompanyName, Phone)
+values ('Microsoft', '(503)567-1234'), 
+('Apple', '(503)565-1274');
+
+update Shippers set CompanyName = 'Amazon' where ShipperID = 3;
+
+delete from Shippers where ShipperID > 7;
+
+delete from Shippers where ShipperID = 5;
+
+select * from Shippers;
+
+/*------------ Tabla Product -------------*/
+
+select ProductName, SupplierID, CategoryID from Products;
+
+select ProductName, SupplierID, CategoryID from Products order by ProductName desc;
+
+select * from Products where SupplierID != 7;
+
+select * from Products where ProductID != 7;
+
+select * from Products where SupplierID not in(7, 3);
+
+select COUNT (*) from Products;
+
+select SUM (UnitsInStock) as Stock from Products;
+
+select MIN (UnitsInStock) as Stock from Products;
+
+select sum(UnitsInStock * ReorderLevel) as Stock from Products; 
+
+select 
+max (UnitsInStock) Maximo,
+min (UnitsInStock) Minino,
+avg (UnitsInStock) Promedio
+from Products;
+
+select * from Products;
+
+/*------------ Tabla Customers -------------*/
+
+select CompanyName, ContactName from Customers;
+
+select CompanyName, ContactName from Customers order by ContactName;
+
+select distinct Country from Customers;
+
+select distinct City, Country from Customers;
+
+select * from Customers where Country = 'USA' and Region = 'WA';  
+
+select * from Customers;
+
+/*------------ Tabla Employees -------------*/
+
+select * from Employees where BirthDate between '1952-02-19 00:00:00.000' and '1992-04-01 00:00:00.000';
+
+select * from Employees where YEAR(BirthDate) = 1963; 
+
+select * from Employees where Region is NULL;
+
+select COUNT (EmployeeID) from Employees;
+ 
+select * from Employees;
+
+/*------------ Tabla Orders (Ejercicio) -------------*/
+
+select * from Orders
+
+select OrderID, ShippedDate, ShipCity, ShipPostalCode, ShipCountry from Orders
+where ShipCountry in ('Argentina', 'Brazil', 'Venezuela') and year(ShippedDate) = 1997 and MONTH(ShippedDate) = 01
+order by ShipCountry, ShippedDate;
+
+/*-------------------  Ejercicio --------------------*/
+/*
+ SELECT lista_de_campos
+[ FROM nombre_tabla ]
+[ WHERE condicion_individual]
+[ GROUP BY campos_a_agrupar ]
+[ HAVING condicion_grupo ]
+[ ORDER BY campo_a_ordenar [ ASC | DESC ] ]
+*/
+
+/* 
+ * 1) Listado de clientes de España ordenados por ciudad. Mostrar el nombre de la compañía, dirección, ciudad y teléfono.
+ */
+
+SELECT CompanyName, Address, City, Phone 
+FROM Customers 
+WHERE Country = 'Spain' 
+ORDER BY City;
+
+
+/* 
+ * 2) Listado de órdenes del cliente QUICK registradas en el año 1996, ordenadas por peso (freight) de mayor a menor.
+ */
+
+SELECT * 
+FROM Orders 
+WHERE CustomerID = 'QUICK' and YEAR(OrderDate) = 1996 
+ORDER by Freight DESC;
+
+
+/* 
+ * 3) Cantidad de productos con categoría 1.
+*/
+	
+SELECT COUNT(*) Cantidad_Productos 
+FROM Products 
+WHERE CategoryID = 1;
+
+
+/* 
+ * 4) Total de unidades en stock de productos discontinuados.
+ */
+
+SELECT SUM(UnitsInStock) Stock 
+FROM Products 
+WHERE Discontinued = 1; 
+
+
+/* 
+ * 5)Listado de órdenes enviadas a la ciudad de Río de Janeiro cuyo peso sea superior a 60 kg. 
+ *   Mostrar el número de orden, el nombre de la compañía cliente, el nombre y apellido del empleado y el peso del envío. 
+ */
+
+SELECT O.OrderID, C.CompanyName, E.LastName, E.FirstName, O.Freight
+FROM Orders O INNER JOIN Customers C ON O.CustomerID = C.CustomerID
+INNER JOIN Employees E ON O.EmployeeID = E.EmployeeID 
+WHERE ShipCity = 'Rio de Janeiro' AND Freight > 60;
+
+
+/*  
+* 6) Detalle de la orden 10309, mostrando el nombre del producto, 
+*    el precio unitario, la cantidad, el descuento, el subtotal (este dato se debe calcular), 
+*    ordenado por producto alfabéticamente. 
+*/
+
+SELECT P.ProductName, od.UnitPrice, od.Quantity, od.Discount, ((od.Quantity * od.UnitPrice) * (1-od.Discount)) Subtotal
+FROM Orders O 
+INNER JOIN [Order Details] od ON O.OrderID = od.OrderID
+INNER JOIN Products P ON P.ProductID = od.ProductID
+WHERE O.OrderID = 10309
+ORDER BY P.ProductName;
+
